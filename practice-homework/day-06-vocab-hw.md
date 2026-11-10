@@ -3,11 +3,17 @@
 ## Double Possibility
 
 ### The demise of the rigorous academic curriculum in high school resulted, in part, from the progressive rhetoric that **\_\_\_\_** the study of subjects previously thought **\_\_\_\_** as part of school learning.
-- removing ... irrelevant
+<img src="images/day6q1.png" width="50%" alt="question and options">
+
+- challenge ... good
+- endorsed ... bad
 
 ### Dependence on foreign sources of heavy metals, though **\_\_\_\_**, remains **\_\_\_\_** for United States foreign policy.
+<img src="images/day6q2.png" width="50%" alt="question and options">
+
 - major .... minor part 
 - minor .... major part 
+#### diminishing ... a problem
 
 ### Stealing candy bars is something we greatly **\_\_\_\_** in this town, so it's no shocker that the town council recently **\_\_\_\_** fines for petty theft. 
 - condemn ... increased
@@ -17,9 +23,9 @@
 
 ### We realized that John is still young and impressionable, but were nevertheless surprised at his **\_\_\_\_**.
 - [x] naivette
-- [ ] obstinateness
+- [ ] obstinateness 
 - [ ] decisiveness 
-- [x] ingeniousness
+- [ ] ingeniousness (not ingeneousness)
 - [ ] resolve
 
 ### The new policy initiative will be, at best, a temporary fix to a deeply rooted problem; at worst, it will be **\_\_\_\_**.
@@ -29,7 +35,7 @@
 - detrimental 
 
 ### Many critics of the new policy argue that it is **\_\_\_\_**, with some going so far as to **\_\_\_\_** it a step backwards for the organization. 
-- useless ... label 
+- useless ... condemn 
 ---
 ## Logic Word as Guess
 

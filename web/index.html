@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vocab Galaxy - Semantic GRE Vocabulary Clustering</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-theme">
+  <!-- Top Application Header -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <circle cx="6" cy="6" r="2"></circle>
+            <circle cx="18" cy="7" r="2"></circle>
+            <circle cx="6" cy="18" r="2"></circle>
+            <circle cx="18" cy="18" r="2"></circle>
+            <path d="M12 9V6M9.5 10.5L7.5 7.5M14.5 10.5L16.5 8M9.5 13.5L7.5 16.5M14.5 13.5L16.5 16.5M12 15v3" opacity="0.6"></path>
+          </svg>
+        </div>
+        <div class="logo-text">
+          <h1>Vocab Galaxy</h1>
+          <span class="subtitle">Semantic GRE Clustering &amp; Meaning Brackets</span>
+        </div>
+      </div>
+
+      <!-- Quick Metrics Pill -->
+      <div class="stats-pills">
+        <span class="pill" id="total-words-pill"><strong>1,020</strong> Words</span>
+        <span class="pill" id="total-brackets-pill"><strong>265</strong> Semantic Brackets</span>
+        <span class="pill" id="total-groups-pill"><strong>34</strong> Mountain Groups</span>
+      </div>
+    </div>
+
+    <!-- View Mode Switcher -->
+    <nav class="view-tabs" role="tablist">
+      <button class="tab-btn active" data-view="map" role="tab" title="2D Semantic Galaxy Map">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="4"></circle><line x1="12" y1="2" x2="12" y2="4"></line><line x1="12" y1="20" x2="12" y2="22"></line><line x1="20" y1="12" x2="22" y2="12"></line><line x1="2" y1="12" x2="4" y2="12"></line></svg>
+        <span>Semantic Map</span>
+      </button>
+      <button class="tab-btn" data-view="table" role="tab" title="Words in brackets in tabular format with persistent notes">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line><line x1="9" y1="3" x2="9" y2="21"></line></svg>
+        <span>Bracket Table</span>
+      </button>
+      <button class="tab-btn" data-view="brackets" role="tab" title="Words grouped into similarity brackets">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+        <span>Similarity Brackets</span>
+      </button>
+      <button class="tab-btn" data-view="network" role="tab" title="Constellation Graph View">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+        <span>Synonym Network</span>
+      </button>
+      <button class="tab-btn" data-view="groups" role="tab" title="Original 34 Mountain Groups">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 20h18L14 4l-4 8-3-4-4 12z"></path></svg>
+        <span>Mountain Groups</span>
+      </button>
+      <button class="tab-btn struggle-tab-btn" data-view="struggle" role="tab" title="Words marked for focused revision">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+        <span>Struggle Bucket</span>
+        <span class="tab-badge" id="struggle-tab-badge">0</span>
+      </button>
+    </nav>
+
+    <!-- Header Right Controls -->
+    <div class="header-right">
+      <!-- Search Input -->
+      <div class="search-box">
+        <svg class="search-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" id="search-input" placeholder="Search word, definition, synonym... ( / )" autocomplete="off" spellcheck="false">
+        <button id="clear-search" class="clear-btn" title="Clear search" style="display:none;">&times;</button>
+        <div id="search-dropdown" class="search-dropdown" style="display:none;"></div>
+      </div>
+
+      <!-- Theme Switcher Button -->
+      <button id="theme-toggle" class="icon-btn" title="Toggle Dark/Light Mode">
+        <svg class="moon-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        <svg class="sun-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" style="display:none;"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+      </button>
+
+      <!-- Help / About Modal Trigger -->
+      <button id="help-toggle" class="icon-btn" title="How This Works">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Sub-Header Filter Bar -->
+  <div class="filter-bar">
+    <div class="filter-group">
+      <label for="bracket-filter">Semantic Bracket:</label>
+      <select id="bracket-filter">
+        <option value="all">All 265 Brackets</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="group-filter">Mountain Group:</label>
+      <select id="group-filter">
+        <option value="all">All 34 Mountain Groups</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="pos-filter">Part of Speech:</label>
+      <select id="pos-filter">
+        <option value="all">All Parts of Speech</option>
+        <option value="adjective">Adjectives</option>
+        <option value="verb">Verbs</option>
+        <option value="noun">Nouns</option>
+        <option value="adverb">Adverbs</option>
+      </select>
+    </div>
+
+    <div class="filter-group network-only" style="display: none;">
+      <label for="sim-threshold">Min Similarity: <span id="sim-val">0.72</span></label>
+      <input type="range" id="sim-threshold" min="0.65" max="0.88" step="0.01" value="0.72">
+    </div>
+
+    <button id="toggle-struggle-filter" class="filter-toggle-btn" title="Toggle between all words and words you struggle with">
+      <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+      <span>Struggling Only (<span id="struggle-filter-count">0</span>)</span>
+    </button>
+
+    <button id="reset-filters" class="text-btn">Reset Filters</button>
+
+    <div class="active-count" id="active-count">Showing 1020 words</div>
+  </div>
+
+  <!-- Main Content Viewport -->
+  <main class="main-viewport">
+    
+    <!-- View 1: 2D Interactive Semantic Map -->
+    <section id="view-map" class="view-panel active">
+      <div class="canvas-container">
+        <canvas id="galaxy-canvas"></canvas>
+
+        <!-- Floating Map Controls -->
+        <div class="map-controls">
+          <button id="zoom-in" class="ctrl-btn" title="Zoom In">+</button>
+          <button id="zoom-out" class="ctrl-btn" title="Zoom Out">&minus;</button>
+          <button id="zoom-reset" class="ctrl-btn" title="Fit All Words">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+          </button>
+          <div class="divider"></div>
+          <button id="toggle-labels" class="ctrl-btn active" title="Toggle Bracket Labels">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7V4h16v3M9 20h6M12 4v16"></path></svg>
+          </button>
+          <button id="toggle-links" class="ctrl-btn active" title="Toggle Neighbor Synaptic Links">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="3" x2="6" y2="15"></line><circle cx="18" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M18 9a9 9 0 0 1-9 9"></path></svg>
+          </button>
+        </div>
+
+        <!-- Mini Cluster Legend Drawer (Collapsible) -->
+        <div class="cluster-legend" id="cluster-legend">
+          <div class="legend-header" id="legend-toggle">
+            <span>Semantic Brackets (<span id="legend-count">265</span>)</span>
+            <svg class="chevron" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </div>
+          <div class="legend-list" id="legend-list">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <!-- Instructional Overlay Hint -->
+        <div class="map-hint">
+          <span>💡 Hover any word to preview description HTML &bull; Click to lock detail &bull; Drag to pan &bull; Scroll to zoom</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- View: Bracket Tabular Format -->
+    <section id="view-table" class="view-panel">
+      <div class="table-container">
+        <div class="table-header-bar">
+          <div class="table-intro">
+            <h2>Bracket Tabular View</h2>
+            <p>Inspect GRE words organized by semantic bracket in a clean tabular view. Filter by bracket or mountain group, search words or definitions, and write persistent personal notes for each word.</p>
+          </div>
+          <div class="table-actions-toolbar">
+            <div class="table-search-box">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              <input type="text" id="table-search-input" placeholder="Search in table..." autocomplete="off">
+              <button id="table-search-clear" class="clear-btn" style="display:none;">&times;</button>
+            </div>
+            <div class="table-toggles">
+              <label class="table-toggle-label">
+                <input type="checkbox" id="table-notes-only-toggle">
+                <span>Notes Only (<span id="table-notes-count">0</span>)</span>
+              </label>
+              <button id="table-export-notes-btn" class="btn-secondary" title="Export all your personal word notes as a JSON file">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path></svg>
+                <span>Export Notes</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-meta-bar">
+          <span id="table-row-count-badge" class="table-stat-badge">Showing 1,020 words</span>
+          <span class="table-tip">💡 Click any note cell to edit inline; notes auto-save to <code>notes.json</code> on disk</span>
+        </div>
+
+        <div class="table-scroll-wrapper">
+          <table class="vocab-table" id="vocab-table">
+            <thead>
+              <tr>
+                <th class="th-num">#</th>
+                <th class="th-word sortable" data-sort="word">Word <span class="sort-indicator"></span></th>
+                <th class="th-bracket sortable" data-sort="bracket">Bracket <span class="sort-indicator"></span></th>
+                <th class="th-group sortable" data-sort="group">Group <span class="sort-indicator"></span></th>
+                <th class="th-def">Primary Definition</th>
+                <th class="th-syns">Synonyms</th>
+                <th class="th-notes sortable" data-sort="notes">Personal Notes <span class="sort-indicator"></span></th>
+                <th class="th-actions">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="table-body">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+          <div id="table-empty-state" class="table-empty-state" style="display: none;">
+            <p>No words match your current filters or search term.</p>
+            <button id="table-reset-filters-btn" class="btn-secondary">Reset Filters</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- View 2: Semantic Similarity Brackets (Cards / Grid View) -->
+    <section id="view-brackets" class="view-panel">
+      <div class="brackets-container">
+        <div class="brackets-header">
+          <div class="brackets-intro">
+            <h2>Semantic Similarity Brackets</h2>
+            <p>Words clustered by meaning into cohesive GRE study brackets. Every word in a bracket shares key semantic themes or direct synonym ties.</p>
+          </div>
+          <div class="brackets-search">
+            <input type="text" id="bracket-search-input" placeholder="Filter brackets or words..." autocomplete="off">
+          </div>
+        </div>
+        <div class="brackets-grid" id="brackets-grid">
+          <!-- Populated by JavaScript -->
+        </div>
+      </div>
+    </section>
+
+    <!-- View 3: Synonym Network (Force-directed Graph) -->
+    <section id="view-network" class="view-panel">
+      <div class="canvas-container">
+        <canvas id="network-canvas"></canvas>
+        <div class="map-hint">
+          <span>🕸️ Visualizing direct semantic similarity connections (threshold &ge; <span id="network-thresh-hint">0.72</span>)</span>
+        </div>
+        <div class="map-controls">
+          <button id="net-zoom-in" class="ctrl-btn" title="Zoom In">+</button>
+          <button id="net-zoom-out" class="ctrl-btn" title="Zoom Out">&minus;</button>
+          <button id="net-zoom-reset" class="ctrl-btn" title="Reset View">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- View 4: Mountain Groups (Original 34 Groups Comparison) -->
+    <section id="view-groups" class="view-panel">
+      <div class="groups-container">
+        <div class="brackets-header">
+          <div class="brackets-intro">
+            <h2>Original 34 Mountain Groups</h2>
+            <p>Explore the original linear GregMat Vocab Mountain groups and see how words from different groups connect into semantic similarity brackets.</p>
+          </div>
+        </div>
+        <div class="groups-grid" id="groups-grid">
+          <!-- Populated by JavaScript -->
+        </div>
+      </div>
+    </section>
+
+    <!-- View 5: Struggle & Revision Bucket -->
+    <section id="view-struggle" class="view-panel">
+      <div class="struggle-container">
+        <div class="struggle-header">
+          <div class="struggle-intro">
+            <div class="struggle-title-row">
+              <span class="struggle-star-icon">★</span>
+              <h2>Struggle &amp; Revision Bucket</h2>
+              <span class="struggle-count-badge" id="struggle-header-count">0 words</span>
+            </div>
+            <p>Words you marked as difficult so you can revise them in a dedicated bucket without studying all 1,020 words every time. Study them grouped by their semantic meaning brackets or flip through flashcards!</p>
+          </div>
+          <div class="struggle-actions-bar">
+            <div class="struggle-mode-toggle">
+              <button class="struggle-mode-btn active" data-smode="brackets" title="Group struggling words by their meaning brackets">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                <span>Semantic Brackets</span>
+              </button>
+              <button class="struggle-mode-btn" data-smode="flashcards" title="Practice in Flashcard Mode">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="M7 15h10M7 9h10"></path></svg>
+                <span>Flashcard Quiz</span>
+              </button>
+            </div>
+            <button id="export-struggle-btn" class="btn-secondary" title="Export your struggle list as JSON">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path></svg>
+              <span>Export</span>
+            </button>
+            <button id="clear-struggle-btn" class="btn-danger-ghost" title="Clear all words from your struggle bucket">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+              <span>Clear Bucket</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Struggle Views Container -->
+        <div id="struggle-empty-state" class="struggle-empty-state" style="display:none;">
+          <div class="empty-icon">★</div>
+          <h3>Your Struggle Bucket is Empty!</h3>
+          <p>You haven't marked any words for revision yet. Click the <strong>★ Star</strong> button on any word card, hover popup, or on the 2D Galaxy Map to add difficult words to this bucket.</p>
+          <button id="struggle-explore-btn" class="btn-primary">Explore Semantic Map</button>
+        </div>
+
+        <div id="struggle-brackets-content" class="struggle-brackets-content">
+          <div class="brackets-grid" id="struggle-brackets-grid"></div>
+        </div>
+
+        <div id="struggle-flashcards-content" class="struggle-flashcards-content" style="display:none;">
+          <div class="flashcards-toolbar">
+            <span id="fc-progress">Card 1 of 10</span>
+            <div class="fc-nav-btns">
+              <button id="fc-prev-btn" class="ctrl-btn">&larr; Prev</button>
+              <button id="fc-next-btn" class="ctrl-btn">Next &rarr;</button>
+            </div>
+          </div>
+          <div class="flashcard-deck" id="flashcard-deck"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============================================== -->
+  <!-- HOVER POPUP (The rich description HTML popup) -->
+  <!-- ============================================== -->
+  <div id="hover-popup" class="hover-popup" style="display:none;" aria-hidden="true">
+    <div class="popup-glass-card">
+      <div class="popup-top">
+        <div class="popup-title-row">
+          <h3 id="popup-word" class="popup-word">Word</h3>
+          <div class="popup-actions-group">
+            <button id="popup-struggle-btn" class="icon-toggle-btn struggle-toggle" title="Mark as Struggling / Needs Review">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+              </svg>
+            </button>
+            <button id="popup-audio-btn" class="popup-audio-btn" title="Play pronunciation">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="popup-badges">
+          <span id="popup-pos" class="pos-badge"></span>
+          <span id="popup-bracket" class="bracket-badge"></span>
+          <span id="popup-group" class="group-badge"></span>
+        </div>
+      </div>
+
+      <!-- Raw & Clean Description HTML -->
+      <div class="popup-description-container">
+        <div id="popup-description" class="popup-description-html">
+          <!-- Description HTML injected dynamically here -->
+        </div>
+      </div>
+
+      <!-- Personal Note Preview (if word has a note) -->
+      <div id="popup-note-box" class="popup-note-box" style="display:none;">
+        <span class="popup-note-icon">📝</span>
+        <div class="popup-note-content">
+          <span class="popup-note-label">My Note:</span>
+          <span id="popup-note-text"></span>
+        </div>
+      </div>
+
+      <!-- Semantic Neighbors Section -->
+      <div class="popup-neighbors">
+        <span class="neighbors-label">Similar Words:</span>
+        <div id="popup-neighbors-list" class="neighbors-pills"></div>
+      </div>
+
+      <div class="popup-footer">
+        <span>Click to lock &amp; inspect</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- PINNED WORD DETAIL DRAWER / INSPECTOR MODAL   -->
+  <!-- ============================================== -->
+  <div id="drawer-backdrop" class="drawer-backdrop" style="display:none;"></div>
+  <aside id="word-drawer" class="word-drawer" aria-hidden="true">
+    <div class="drawer-header">
+      <div class="drawer-title-box">
+        <h2 id="drawer-word" class="drawer-word">Word</h2>
+        <div class="drawer-btns-row">
+          <button id="drawer-struggle-btn" class="drawer-action-btn struggle-toggle" title="Mark / Unmark as Struggling">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+            <span id="drawer-struggle-label">Mark as Struggling</span>
+          </button>
+          <button id="drawer-audio-btn" class="drawer-audio-btn" title="Play Pronunciation">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            </svg>
+            <span>Listen</span>
+          </button>
+        </div>
+      </div>
+      <button id="drawer-close" class="close-btn" title="Close Drawer">&times;</button>
+    </div>
+
+    <div class="drawer-content">
+      <div class="drawer-meta-tags">
+        <span id="drawer-bracket-tag" class="tag bracket-tag"></span>
+        <span id="drawer-group-tag" class="tag group-tag"></span>
+        <span id="drawer-pos-tag" class="tag pos-tag"></span>
+      </div>
+
+      <!-- My Word Notes Section -->
+      <div class="drawer-section drawer-notes-section">
+        <div class="drawer-notes-header">
+          <h4 class="section-title">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; margin-right: 4px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+            My Notes
+          </h4>
+          <span id="drawer-note-status" class="note-status-tag" style="display:none;">Saved ✓</span>
+        </div>
+        <div class="drawer-note-wrapper">
+          <textarea id="drawer-note-input" class="drawer-note-textarea" placeholder="Add personal notes, mnemonics, or memory hooks... (auto-saves to notes.json)"></textarea>
+          <div class="drawer-note-actions">
+            <button id="drawer-save-note-btn" class="btn-primary-sm">Save Note</button>
+            <button id="drawer-clear-note-btn" class="btn-text-sm" style="display:none;">Clear Note</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="drawer-section">
+        <h4 class="section-title">Description &amp; Examples</h4>
+        <div id="drawer-description" class="drawer-description-html"></div>
+      </div>
+
+      <div class="drawer-section">
+        <h4 class="section-title">Closest Semantic Neighbors</h4>
+        <div id="drawer-neighbors" class="drawer-neighbors-list"></div>
+      </div>
+
+      <div class="drawer-section">
+        <h4 class="section-title" id="drawer-cluster-siblings-title">Other Words in this Bracket</h4>
+        <div id="drawer-siblings" class="drawer-siblings-chips"></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ============================================== -->
+  <!-- ABOUT / ALGORITHM MODAL                        -->
+  <!-- ============================================== -->
+  <div id="about-modal" class="modal-backdrop" style="display:none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>About Vocab Galaxy &amp; Semantic Clustering</h3>
+        <button id="modal-close" class="close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Vocab Galaxy</strong> transforms 1,020 GRE vocabulary words from GregMat's Vocab Mountain into an interactive semantic universe.</p>
+        
+        <h4>How Clustering Works:</h4>
+        <ol>
+          <li><strong>Dense Embeddings:</strong> Each word's definition, grammatical part of speech, and comprehensive synonym list are vectorized into 384-dimensional dense semantic vectors using the state-of-the-art <code>BAAI/bge-small-en-v1.5</code> language model.</li>
+          <li><strong>Strict Semantic Brackets &amp; Outlier Detection:</strong> Using hierarchical agglomerative clustering with high pairwise similarity thresholds, words are grouped into <strong>264 tightly cohesive semantic brackets</strong> (where only truly similar words are grouped) plus a dedicated <strong>Miscellaneous &amp; Outliers</strong> bracket for solitary terms.</li>
+          <li><strong>2D Topology Mapping:</strong> High-dimensional embeddings are projected onto 2D space using <strong>t-SNE</strong> with cosine metric, preserving local synonym neighborhoods and macro-clusters.</li>
+          <li><strong>Synaptic Neighbors:</strong> Pairwise cosine similarities identify the top 6 closest semantic siblings for each term.</li>
+        </ol>
+
+        <h4>Controls:</h4>
+        <ul>
+          <li><strong>Hover</strong> any word node or pill to instantly inspect its description HTML.</li>
+          <li><strong>Click</strong> to lock the word in the right inspector drawer.</li>
+          <li><strong>Scroll / Pinch</strong> to zoom; <strong>Drag</strong> canvas to explore the galaxy.</li>
+          <li>Press <code>/</code> or <code>Ctrl+K</code> anytime to jump to any word.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Audio Element -->
+  <audio id="audio-player" preload="none"></audio>
+
+  <!-- Load Dataset (pre-generated data.js for file:// and offline support) -->
+  <script src="data.js"></script>
+  <!-- Main Application Script -->
+  <script src="app.js"></script>
+</body>
+</html>
